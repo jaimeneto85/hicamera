@@ -1,10 +1,13 @@
-#HiCamera
+# HiCamera
+
 Módulo para gerenciamento de câmera para fotos, vídeos e enviar da galeria para o React Native.
 
 O objetivo do módulo é tornar mais prático o recurso visual de visualizar e selecionar imagens e/ou vídeo do aparelho.
 
-##Gallery
+## Gallery
+
 Módulo que retorna as fotos do aparelho. Uso:
+
 ```
 import {Gallery} from 'HiCamera'
 ```
