@@ -9,7 +9,7 @@ O objetivo do módulo é tornar mais prático o recurso visual de visualizar e s
 Módulo que retorna as fotos do aparelho. Uso:
 
 ```
-import {Gallery} from 'HiCamera'
+import {Gallery} from 'hicamera'
 ```
 
 ##### Props
@@ -86,7 +86,7 @@ Método que retorna os albums do dispositivo. Assim, é possível utilizar a pro
 
 Exemplo:
 ```javascript
-_getAlbums(albums){
+_getAlbums = (albums) => {
     this.setState({albums})
 }
 <Gallery getAlbums={this._getAlbums}>
@@ -96,7 +96,7 @@ _getAlbums(albums){
 Método que retorna um array com os items selecionados.
 Exemplo:
 ```javascript
-_selectedItems(items){
+_selectedItems = (items) => {
     this.setState({itemsSelected: items})
 }
 <Gallery selectedItems={this._selectedItems}>

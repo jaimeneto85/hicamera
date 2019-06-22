@@ -60,7 +60,8 @@ class HiGallery extends Component{
             photos: [],
             selectedItems: [],
             filterBy: props.filterBy,
-            maxSelect: props.maxSelect || 1
+            maxSelect: props.maxSelect || 1,
+            overwriteSelected: props.overwriteSelected || false
         }
 
         this.albums = []
@@ -123,11 +124,21 @@ class HiGallery extends Component{
             photos[index].selected = false;
             selectedItems = selectedItems.filter( select => select !== item)
         } else {
-            photos[index].selected = true;
-            if(selectedItems.length){
+            if( this.state.maxSelect > selectedItems.length){
+                photos[index].selected = true;
                 selectedItems = selectedItems.concat(item);
-            }else{
-                selectedItems = [item];
+            } else if ( this.state.maxSelect == selectedItems.length && this.state.overwriteSelected ){
+                itemRemoved = selectedItems.shift();
+                photos = photos.map( photo => {
+                    if(photo.node === itemRemoved.node){
+                        photo.selected = false;
+                        return photo;
+                    }else{
+                        return photo;
+                    }
+                })
+                photos[index].selected = true;
+                selectedItems = selectedItems.concat(item);
             }
         }
         await this.setState({photos, selectedItems})
