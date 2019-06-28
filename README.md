@@ -4,6 +4,54 @@ Módulo para gerenciamento de câmera para fotos, vídeos e enviar da galeria pa
 
 O objetivo do módulo é tornar mais prático o recurso visual de visualizar e selecionar imagens e/ou vídeo do aparelho.
 
+## Dependências
+- `react-native-camera`
+- `fotoapparat`
+
+## CameraVideo
+
+Módulo que retorna component com a Câmera ativa. Uso:
+
+```
+import {CameraVideo} from 'hicamera'
+```
+
+##### Props
+* [containerStyle](#containerStyle)
+* [cameraStyle](#cameraStyle)
+* [cameraType](#cameraType)
+<!-- * [quality](#quality) -->
+* [orientation](#orientation)
+* [maxDuration](#maxDuration)
+
+###### containerStyle
+`Object` estilo da View que leva a câmera
+
+###### cameraStyle
+`Object` estilo da Câmera em si
+
+###### cameraType
+`Integer` valor `0` (default) ou `1`, onde representa:
+- `0` camera traseira
+- `1` camera dianteira
+
+<!-- ###### quality
+`Object` estilo da Câmera em si -->
+
+###### orientation
+`String` orientação da câmera. Valores: "portrait", "portraitUpsideDown", "landscapeLeft" or "landscapeRight"
+
+###### maxDuration
+`Integer` valor máximo (em segundos) da gravação do vídeo. Sem atribuir a propriedade, o vídeo só é encerrado quando o usuário escolher
+
+##### Methods
+* getVideo
+* onStartRecording
+* onStopRecording
+
+
+## CameraPhoto
+
 ## Gallery
 
 Módulo que retorna as fotos do aparelho. Uso:

@@ -1,6 +1,6 @@
 {
   "name": "hicamera",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Módulo para gerenciamento de câmera para fotos, vídeos e enviar da galeria para o React Native.",
   "main": "index.js",
   "scripts": {

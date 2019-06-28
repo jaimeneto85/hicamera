@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { 
     View, 
+    Text,
     CameraRoll, 
     Platform, 
     PermissionsAndroid, 
@@ -10,7 +11,10 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-const deviceWidth = Dimensions.get('window').width
+import { RNCamera, FaceDetector } from 'react-native-camera';
+
+const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
 
 async function requestStoragePermission() {
     try {
@@ -38,10 +42,111 @@ async function requestStoragePermission() {
 }
 
 export default class HiCamera extends Component{
+    constructor(props){
+        super(props);
+
+        this.styles = {
+            containerStyle: props.containerStyle || { },
+            cameraStyle: props.cameraStyle || { width: deviceWidth, height: deviceHeight},
+        }
+    }
     render(){
         return(
-            <View />
+            <View>
+                <RNCamera
+                    ref={ref => { this.camera = ref }}
+                    style={this.styles.cameraStyle}
+                    type={RNCamera.Constants.Type.back}
+                    flashMode={RNCamera.Constants.FlashMode.on}
+                    androidCameraPermissionOptions={{
+                        title: 'Permission to use camera',
+                        message: 'We need your permission to use your camera',
+                        buttonPositive: 'Ok',
+                        buttonNegative: 'Cancel',
+                    }}
+                    androidRecordAudioPermissionOptions={{
+                    title: 'Permission to use audio recording',
+                    message: 'We need your permission to use your audio',
+                    buttonPositive: 'Ok',
+                    buttonNegative: 'Cancel',
+                    }}
+                    onGoogleVisionBarcodesDetected={(response) => {
+                        console.log(response);
+                    }}
+                    type={this.props.type}
+                    >
+                    </RNCamera>
+            </View>
         )
+    }
+}
+
+export class CameraVideo extends Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            recording: false,
+            cameraType: props.cameraType || RNCamera.Constants.Type.back
+        }
+        
+        this.styles = {
+            containerStyle: props.containerStyle || {},
+            cameraStyle: props.cameraStyle || { width: deviceWidth, height: deviceHeight}
+        }
+
+        this.options = {
+            quality: props.quality,
+            orientation: props.orientation || 'portrait',
+            maxDuration: props.maxDuration || 0
+        }
+    }
+
+    toggleCamera(){
+        if(this.state.cameraType === RNCamera.Constants.Type.back){
+            this.setState({cameraType: RNCamera.Constants.Type.front})
+        } else {
+            this.setState({cameraType: RNCamera.Constants.Type.back})
+        }
+    }
+
+    render(){
+        return(
+            <View style={this.styles.containerStyle}>
+                <HiCamera
+                    ref={ ref => { this.ref = ref } }
+                    cameraStyle={this.styles.cameraStyle}
+                    type={this.state.cameraType}
+                />
+                {!this.props.hideButtons && <View style={{position: 'absolute', right: 20, top: 20 }}>
+                    <TouchableOpacity onPress={()=> this.toggleCamera() }>
+                        <Text>Trocar Camera</Text>
+                    </TouchableOpacity>
+                </View>}
+                { !this.props.hideButtons &&
+                <View style={{position: 'absolute', bottom: 50, left: deviceWidth/2-50}}>
+                    <TouchableOpacity onPress={ () => this.recordVideo() }>
+                        <View style={{borderColor: 'rgba(200, 200, 200, 0.5)', borderRadius: 50, borderWidth: 5, height: 100, width: 100, paddingTop: this.state.recording? 20 : 10, paddingLeft: this.state.recording? 20 : 10 }}>
+                            <View style={{backgroundColor: this.state.recording? 'rgba(255,0,0,0.5)' : 'rgba(200, 200, 200, 0.5)', borderRadius: this.state.recording? 5 : 35, height: this.state.recording? 50: 70, width: this.state.recording? 50 : 70}} />
+                        </View>
+                    </TouchableOpacity>
+                </View>}
+            </View>
+        )
+    }
+
+    async recordVideo(){
+        if(this.state.recording){
+           this.setState({recording: false}) 
+           this.ref.camera.stopRecording();
+           if(this.props.onStopRecording) this.props.onStopRecording()
+        } else {
+            this.setState({recording: true})
+            const { options } = this;
+            const data = await this.ref.camera.recordAsync(options);
+            if(this.props.onStartRecording) this.props.onStartRecording()
+            if(this.props.getVideo) this.props.getVideo(data);
+        } 
     }
 }
 
