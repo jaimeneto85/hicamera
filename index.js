@@ -157,7 +157,7 @@ class HiGallery extends Component{
 
         this.state = {
             galleryType: props.galleryType || 'Photos',
-            group: props.group || 'SavedPhotos',
+            group: props.group || 'All',
             title: props.title,
             perPage: props.perPage || 99999,
             columns: props.columns || 4,
@@ -166,7 +166,8 @@ class HiGallery extends Component{
             selectedItems: [],
             filterBy: props.filterBy,
             maxSelect: props.maxSelect || 1,
-            overwriteSelected: props.overwriteSelected || false
+            overwriteSelected: props.overwriteSelected || false,
+            indexLoaded: 2
         }
 
         this.albums = []
@@ -194,7 +195,8 @@ class HiGallery extends Component{
         let photos = await CameraRoll.getPhotos({
             first: this.state.perPage,
             assetType: this.state.galleryType,
-            groupName: this.state.filterBy
+            groupName: this.state.filterBy,
+            groupType: this.state.group
           })
           .then( r => r );
         await this.setState({ after: photos.page_info.end_cursor, photos: photos.edges})
@@ -256,12 +258,17 @@ class HiGallery extends Component{
         this.setState({selectedItems, photos})
     }
 
+    updateIndexLoaded(index){
+        this.setState({indexLoaded: index+2})
+    }
+
     _renderItem = ({item, index}) =>{
         return (
-            <TouchableOpacity onPress={()=> { this._selectItem(item, index) }}>
+            <TouchableOpacity key={item.node.image.uri}  onPress={()=> { this._selectItem(item, index) }}>
                 <View style={ item.selected? this.styles.selectedStyle : {} } >
                     { item.selected && !!this.props.selectedComponent && this.props.selectedComponent }
-                    <Image key={item.node.image.uri} source={{uri: item.node.image.uri}} resizeMode='cover' style={this.styles.itemStyle}/>
+                    {this.state.indexLoaded >= index && <Image source={{uri: item.node.image.uri}} resizeMode='cover' style={this.styles.itemStyle} onLoadEnd={this.updateIndexLoaded(index)}/>}
+                    {this.state.indexLoaded < index && <View style={this.styles.itemStyle}/>}
                 </View>
             </TouchableOpacity>
         )
