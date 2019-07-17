@@ -10,6 +10,7 @@ import {
     Dimensions,
     TouchableOpacity
 } from 'react-native';
+import ItemRender from './components/ItemRender';
 
 import { RNCamera, FaceDetector } from 'react-native-camera';
 
@@ -167,7 +168,7 @@ class HiGallery extends Component{
             filterBy: props.filterBy,
             maxSelect: props.maxSelect || 1,
             overwriteSelected: props.overwriteSelected || false,
-            indexLoaded: 2
+            indexLoaded: 0
         }
 
         this.albums = []
@@ -195,8 +196,7 @@ class HiGallery extends Component{
         let photos = await CameraRoll.getPhotos({
             first: this.state.perPage,
             assetType: this.state.galleryType,
-            groupName: this.state.filterBy,
-            groupType: this.state.group
+            groupName: this.state.filterBy
           })
           .then( r => r );
         await this.setState({ after: photos.page_info.end_cursor, photos: photos.edges})
@@ -208,7 +208,8 @@ class HiGallery extends Component{
         }
     }
 
-    async _getMore(){
+    _getMore = async () => {
+        console.log('more...')
         let photos = await CameraRoll.getPhotos({
             first: this.state.perPage,
             after: this.state.after,
@@ -225,7 +226,7 @@ class HiGallery extends Component{
         if(this.props.getAlbums) this.props.getAlbums(albums)
     }
 
-    async _selectItem(item, index){
+    _selectItem = async (item, index) => {
         let { photos, selectedItems } = this.state;
         if(item.selected){
             photos[index].selected = false;
@@ -258,35 +259,29 @@ class HiGallery extends Component{
         this.setState({selectedItems, photos})
     }
 
-    updateIndexLoaded(index){
-        this.setState({indexLoaded: index+2})
-    }
-
     _renderItem = ({item, index}) =>{
-        return (
-            <TouchableOpacity key={item.node.image.uri}  onPress={()=> { this._selectItem(item, index) }}>
-                <View style={ item.selected? this.styles.selectedStyle : {} } >
-                    { item.selected && !!this.props.selectedComponent && this.props.selectedComponent }
-                    {this.state.indexLoaded >= index && <Image source={{uri: item.node.image.uri}} resizeMode='cover' style={this.styles.itemStyle} onLoadEnd={this.updateIndexLoaded(index)}/>}
-                    {this.state.indexLoaded < index && <View style={this.styles.itemStyle}/>}
-                </View>
-            </TouchableOpacity>
-        )
+        return <ItemRender 
+                    item={item} 
+                    index={index}
+                    selectItem={this._selectItem} 
+                    style={this.styles.selectedStyle} 
+                    itemStyle={this.styles.itemStyle} 
+                />
     }
 
     _keyExtractor = ( item , index ) => item.node.image.uri
 
     render(){
         return(
-            <View>
                 <FlatList
                     extraData={this.state}
                     data={this.state.photos}
                     numColumns = { this.state.columns }
                     keyExtractor={this._keyExtractor}
                     renderItem={this._renderItem}
+                    onEndReached={this._getMore}
+                    onEndReachedThreshold={0.1}
                 />
-            </View>
         )
     }
 }

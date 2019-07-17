@@ -1,6 +1,6 @@
 {
   "name": "hicamera",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Módulo para gerenciamento de câmera para fotos, vídeos e enviar da galeria para o React Native.",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/jaimeneto85/hicamera#readme",
   "dependencies": {
-    "react": "^16.8.6",
-    "react-native": "0.59.5"
+    "react": "^16.8.6"
   }
 }
